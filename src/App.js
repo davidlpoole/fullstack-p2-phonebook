@@ -7,18 +7,18 @@ import { Entries } from './components/Entries'
 
 const App = () => {
 
-  const [persons, setPersons] = useState([])
+  const [people, setPeople] = useState([])
 
   useEffect(() => {
     console.log('effect')
     axios
-      .get('http://localhost:3001/persons')
+      .get('http://localhost:3001/people')
       .then(response => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPeople(response.data)
       })
   }, [])
-  console.log('render', persons.length, 'notes')
+  console.log('render', people.length, 'notes')
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
@@ -39,13 +39,13 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
 
-    if (persons.map(person => person.name).includes(newName) === false) {
+    if (people.map(person => person.name).includes(newName) === false) {
       const personObject = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1,
+        id: people.length + 1,
       }
-      setPersons(persons.concat(personObject))
+      setPeople(people.concat(personObject))
       setNewName('')
       setNewNumber('')
 
@@ -54,7 +54,7 @@ const App = () => {
     }
   }
 
-  const peopleToShow = persons.filter(person =>
+  const peopleToShow = people.filter(person =>
     person.name.toLowerCase().includes(
       newFilter.toLowerCase()
     ))
