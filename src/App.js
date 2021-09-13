@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import peopleService from './services/people'
 
 import { Form } from './components/Form'
 import { InputField } from './components/InputField'
 import { Entries } from './components/Entries'
+import { Heading } from './components/Heading'
 
 const App = () => {
 
@@ -35,7 +35,6 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-
     if (people.map(person => person.name).includes(newName) === false) {
       const personObject = {
         name: newName,
@@ -54,19 +53,29 @@ const App = () => {
     }
   }
 
+  const deletePerson = id => {
+    let person = people.find(p => p.id === id)
+    if (!window.confirm(`Are you sure you want to delete '${person.name}'?`)) return;
+    peopleService
+      .remove(id)
+      .then(() => {
+        alert(`Deleted '${person.name}' succesfully`)
+        setPeople(people.filter(p => p.id !== id))
+      })
+  }
+
   const peopleToShow = people.filter(person =>
     person.name.toLowerCase().includes(
       newFilter.toLowerCase()
     ))
 
-
   return (
     <div>
+
       <h1>Phonebook</h1>
 
-      <h2>
-        Add new
-      </h2>
+      <Heading text='Add new' />
+
       <Form
         onSubmit={addPerson}
         newName={newName}
@@ -75,9 +84,8 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
 
-      <h2>
-        Numbers
-      </h2>
+      <Heading text='Entries' />
+
       <InputField
         htmlFor='filter'
         label='Filter by Name: '
@@ -86,7 +94,8 @@ const App = () => {
         onChange={handleFilterChange}
       />
 
-      <Entries people={peopleToShow} />
+      <Entries people={peopleToShow} onDelete={deletePerson} />
+
     </div>
   );
 }

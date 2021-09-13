@@ -1,10 +1,18 @@
 import React from 'react';
 
-export const Entries = ({ people }) => {
+const Entry = ({ person, onDelete }) => {
+  return (
+    <li key={person.id}>{person.name} {person.number}
+      <button onClick={() => onDelete(person.id)}>Delete</button>
+    </li>
+  )
+}
+
+export const Entries = ({ people, onDelete }) => {
   return (
     <ul>
       {people.map(person =>
-        <li key={person.id}>{person.name} {person.number}</li>
+        <Entry key={person.id} person={person} onDelete={onDelete} />
       )}
     </ul>
   );
