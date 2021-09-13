@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import peopleService from './services/people'
 
 import { Form } from './components/Form'
 import { InputField } from './components/InputField'
@@ -8,21 +9,17 @@ import { Entries } from './components/Entries'
 const App = () => {
 
   const [people, setPeople] = useState([])
-
-  useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/people')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPeople(response.data)
-      })
-  }, [])
-  console.log('render', people.length, 'notes')
-
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+
+  useEffect(() => {
+    peopleService
+      .getAll()
+      .then(initialPeople => {
+        setPeople(initialPeople)
+      })
+  }, [])
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -45,10 +42,13 @@ const App = () => {
         number: newNumber,
         id: people.length + 1,
       }
-      setPeople(people.concat(personObject))
-      setNewName('')
-      setNewNumber('')
-
+      peopleService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPeople(people.concat(personObject))
+          setNewName('')
+          setNewNumber('')
+        })
     } else {
       window.alert(`${newName} is already in the phonebook`)
     }
