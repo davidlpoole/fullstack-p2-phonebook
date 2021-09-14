@@ -8,11 +8,13 @@ import { Heading } from './components/Heading'
 
 const App = () => {
 
+  // initialise states
   const [people, setPeople] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
 
+  // GET all records on first load
   useEffect(() => {
     peopleService
       .getAll()
@@ -21,6 +23,8 @@ const App = () => {
       })
   }, [])
 
+
+  // Event Handlers
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -33,13 +37,16 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
+
+  // CREATE NEW
   const addPerson = (event) => {
     event.preventDefault()
+
+    // If person does not already exist
     if (people.map(person => person.name).includes(newName) === false) {
       const personObject = {
         name: newName,
-        number: newNumber,
-        id: people.length + 1,
+        number: newNumber
       }
       peopleService
         .create(personObject)
@@ -48,11 +55,25 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
-    } else {
-      window.alert(`${newName} is already in the phonebook`)
+    } else { // if person exists then UPDATE
+      if (!window.confirm(`${newName} is already in the phonebook, overwrite number?`)) return;
+      let person = people.find(p => p.name === newName)
+      const changedPerson = { ...person, number: newNumber }
+
+      peopleService
+        .update(person.id, changedPerson)
+        .then(returnedPerson => {
+          setPeople(
+            people.map(person =>
+              person.id !== returnedPerson.id ? person : returnedPerson))
+          alert(`Updated '${person.name}' succesfully`)
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
+  // DELETE
   const deletePerson = id => {
     let person = people.find(p => p.id === id)
     if (!window.confirm(`Are you sure you want to delete '${person.name}'?`)) return;
@@ -64,10 +85,23 @@ const App = () => {
       })
   }
 
+  //FILTER
   const peopleToShow = people.filter(person =>
     person.name.toLowerCase().includes(
       newFilter.toLowerCase()
     ))
+
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+    return (
+      <div className="error">
+        {message}
+      </div>
+    )
+  }
+
 
   return (
     <div>
