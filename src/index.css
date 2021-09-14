@@ -1,0 +1,45 @@
+h1 {
+    color: black;
+    font-style: italic;
+    font-family: 'Times New Roman', serif;
+}
+
+h2 {
+    color: black;
+    font-family: Helvetica, sans-serif;
+}
+
+body {
+    font-family: Helvetica, sans-serif;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+li {
+    color: grey;
+}
+
+div.input {
+    padding-bottom: 3px;
+}
+
+.notification {
+    background: lightgrey;
+    font-size: 20px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+button.add {
+    color: green;
+}
+
+button.delete {
+      margin-left: 10px;
+      color: red;
+}

@@ -19,7 +19,7 @@ export const Form = ({ onSubmit, newName, handleNameChange, newNumber, handleNum
         value={newNumber}
         onChange={handleNumberChange} />
 
-      <button type="submit">Add</button>
+      <button className='add' type="submit">Add</button>
     </form>
   );
 };

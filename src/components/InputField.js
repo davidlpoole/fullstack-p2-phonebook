@@ -3,7 +3,7 @@ import React from 'react';
 
 export const InputField = ({ htmlFor, label, type, value, onChange }) => {
   return (
-    <div>
+    <div className='input'>
       <label htmlFor={htmlFor}>
         {label}
       </label>
