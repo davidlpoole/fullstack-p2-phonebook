@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import peopleService from './services/people'
 
+import './index.css'
 import { Form } from './components/Form'
 import { InputField } from './components/InputField'
 import { Entries } from './components/Entries'
 import { Heading } from './components/Heading'
+
+
 
 const App = () => {
 
@@ -13,6 +16,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [notification, setNotification] = useState(null)
+  const [notificationType, setNotificationType] = useState('neutral')
 
   // GET all records on first load
   useEffect(() => {
@@ -37,7 +42,6 @@ const App = () => {
     setNewFilter(event.target.value)
   }
 
-
   // CREATE NEW
   const addPerson = (event) => {
     event.preventDefault()
@@ -51,7 +55,8 @@ const App = () => {
       peopleService
         .create(personObject)
         .then(returnedPerson => {
-          setPeople(people.concat(personObject))
+          setPeople(people.concat(returnedPerson))
+          displayNotification(`Added ${returnedPerson.name}`, 'good')
           setNewName('')
           setNewNumber('')
         })
@@ -66,9 +71,13 @@ const App = () => {
           setPeople(
             people.map(person =>
               person.id !== returnedPerson.id ? person : returnedPerson))
-          alert(`Updated '${person.name}' succesfully`)
+          displayNotification(`Updated '${person.name}' succesfully`, 'good')
           setNewName('')
           setNewNumber('')
+        })
+        .catch(error => {
+          displayNotification(`The person '${person.name}' was already deleted on the server`, 'bad')
+          setPeople(people.filter(p => p.id !== person.id))
         })
     }
   }
@@ -80,28 +89,47 @@ const App = () => {
     peopleService
       .remove(id)
       .then(() => {
-        alert(`Deleted '${person.name}' succesfully`)
+        displayNotification(`Deleted '${person.name}' succesfully`, 'good')
         setPeople(people.filter(p => p.id !== id))
+      })
+      .catch(error => {
+        displayNotification(`The person '${person.name}' was already deleted on the server`, 'bad')
+        setPeople(people.filter(p => p.id !== person.id))
       })
   }
 
-  //FILTER
+  // FILTER
   const peopleToShow = people.filter(person =>
     person.name.toLowerCase().includes(
       newFilter.toLowerCase()
     ))
 
-  const Notification = ({ message }) => {
+
+  // Display NOTIFICATION with timeout
+  const displayNotification = (message, type) => {
+    setNotificationType(type)
+    setNotification(message)
+    setTimeout(() => {
+      setNotification(null)
+      setNotificationType('neutral')
+    }, 5000)
+  }
+  // Set notification message and style (good/bad/neutral)
+  const Notification = ({ message, type }) => {
+    const colors = {
+      'neutral': 'black',
+      'good': 'green',
+      'bad': 'red',
+    }
     if (message === null) {
       return null
     }
     return (
-      <div className="error">
-        {message}
+      <div className="notification" style={{ color: colors[type] }}>
+        {notification}
       </div>
     )
   }
-
 
   return (
     <div>
@@ -109,6 +137,8 @@ const App = () => {
       <h1>Phonebook</h1>
 
       <Heading text='Add new' />
+
+      <Notification message={notification} type={notificationType} />
 
       <Form
         onSubmit={addPerson}
